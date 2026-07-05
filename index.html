@@ -222,6 +222,38 @@ function addPost() {
 
 renderPosts();
 </script>
+    <script>
+function loadQuotes() {
+  const box = document.getElementById("quotesBox");
+  const saved = JSON.parse(localStorage.getItem("saintQuotes")) || [];
+
+  box.innerHTML = "";
+
+  saved.forEach(q => {
+    const p = document.createElement("p");
+    p.textContent = q;
+    box.appendChild(p);
+  });
+}
+
+function addQuote() {
+  const input = document.getElementById("quoteInput");
+  const box = document.getElementById("quotesBox");
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  let saved = JSON.parse(localStorage.getItem("saintQuotes")) || [];
+  saved.push(text);
+
+  localStorage.setItem("saintQuotes", JSON.stringify(saved));
+
+  input.value = "";
+  loadQuotes();
+}
+
+window.onload = loadQuotes;
+</script>
 </body>
 </html>
 <section style="max-width:700px;margin:auto;padding:20px;">
