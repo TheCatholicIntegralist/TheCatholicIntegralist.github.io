@@ -75,6 +75,23 @@ h2{
     color:#555;
 }
 
+/* 🔥 SAINT FEED STYLES */
+#saint-feed-box {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    scroll-behavior: smooth;
+}
+
+.post {
+    border:1px solid #ccc;
+    margin:10px 0;
+    padding:10px;
+    background:white;
+}
+
 footer{
     background:#2d1b14;
     color:white;
@@ -97,6 +114,7 @@ footer{
 <a href="#principles">Principles</a>
 <a href="#work">Our Work</a>
 <a href="#contact">Contact</a>
+<a href="#quotes">Saint Quotes</a>
 </nav>
 
 <main>
@@ -109,166 +127,101 @@ Hebrews 3:4
 
 <section id="mission">
 <h2>Mission</h2>
-
 <p>
 Ad Triunum is a Catholic think tank dedicated to studying and promoting the social, political, philosophical, and theological traditions of historic Christianity.
 </p>
-
-<p>
-Our work focuses on post-liberal political thought, Catholic integralism as a subject of intellectual inquiry, and traditional Catholic theology lived in fidelity to the Triune God and His Holy Church.
-</p>
-
-<p>
-We seek to encourage thoughtful discussion, serious scholarship, and practical engagement rooted in the Catholic intellectual tradition. We believe ideas matter and that Christians are called to contribute to the common good through charity, truth, and faithful witness.
-</p>
-
 </section>
 
 <section id="principles">
-
 <h2>Principles</h2>
-
 <ul>
 <li>Fidelity to Sacred Scripture and Sacred Tradition.</li>
-
 <li>Respect for the teaching authority of the Catholic Church.</li>
-
 <li>Promotion of the dignity of the human person.</li>
-
-<li>Study of Catholic social teaching and post-liberal political thought.</li>
-
 <li>Defense of the family and the common good.</li>
-
-<li>Serious intellectual formation grounded in reason and faith.</li>
-
 </ul>
-
 </section>
 
 <section id="work">
-
 <h2>Our Work</h2>
-
-<p>
-We publish essays, educational resources, reading recommendations, historical studies, and commentary on theology, philosophy, history, and Catholic social thought.
-</p>
-
-<p>
-Our long-term vision is to cultivate informed discussion and foster communities committed to living out Christian principles in public and private life.
-</p>
-
+<p>We publish essays, studies, and Catholic intellectual resources.</p>
 </section>
 
 <section id="contact">
+<h2>Contact</h2>
+<p>More information will be added later.</p>
+</section>
 
-<h2>Join the Conversation</h2>
+<!-- ✝ SAINT QUOTES SECTION -->
+<section id="quotes">
+<h2>✝ Saint & Clergy Quotes</h2>
 
-<p>
-If you are interested in contributing articles, participating in discussions, or collaborating on research projects, we welcome your interest.
-</p>
+<input id="saint" placeholder="Saint or Clergy Name" style="width:100%;padding:8px;"><br><br>
 
-<p>
-Additional contact information will be added as the project develops.
-</p>
+<textarea id="quote" placeholder="Write the quote..." style="width:100%;height:80px;padding:8px;"></textarea><br><br>
 
+<input id="img" placeholder="Image URL (optional)" style="width:100%;padding:8px;"><br><br>
+
+<button onclick="addPost()" style="padding:10px 15px;">Post Quote</button>
+
+<hr>
+
+<div id="saint-feed-box"></div>
 </section>
 
 </main>
 
 <footer>
-
 © 2026 Ad Triunum
-
 </footer>
+
 <script>
-let posts = JSON.parse(localStorage.getItem("saint_posts") || "[]");
+function loadPosts() {
+    const feed = document.getElementById("saint-feed-box");
+    const posts = JSON.parse(localStorage.getItem("saint_posts") || "[]");
 
-function renderPosts() {
-  const feed = document.getElementById("feed");
-  feed.innerHTML = "";
+    feed.innerHTML = "";
 
-  posts.forEach(p => {
-    feed.innerHTML += `
-      <div style="border:1px solid #ccc;margin:10px 0;padding:10px;">
-        <h3>${p.saint}</h3>
-        <p style="font-style:italic;">"${p.quote}"</p>
-        ${p.img ? `<img src="${p.img}" style="max-width:200px;">` : ""}
-      </div>
-    `;
-  });
+    posts.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "post";
+
+        div.innerHTML = `
+            <h3>${p.saint}</h3>
+            <p style="font-style:italic;">"${p.quote}"</p>
+            ${p.img ? `<img src="${p.img}" style="max-width:200px;">` : ""}
+        `;
+
+        feed.appendChild(div);
+    });
 }
 
 function addPost() {
-  const saint = document.getElementById("saint").value;
-  const quote = document.getElementById("quote").value;
-  const img = document.getElementById("img").value;
+    const saint = document.getElementById("saint").value.trim();
+    const quote = document.getElementById("quote").value.trim();
+    const img = document.getElementById("img").value.trim();
 
-  if (!saint || !quote) return;
+    if (!saint || !quote) return;
 
-  posts.unshift({
-    saint: saint,
-    quote: quote,
-    img: img
-  });
+    let posts = JSON.parse(localStorage.getItem("saint_posts") || "[]");
 
-  localStorage.setItem("saint_posts", JSON.stringify(posts));
+    posts.unshift({
+        saint: saint,
+        quote: quote,
+        img: img
+    });
 
-  document.getElementById("saint").value = "";
-  document.getElementById("quote").value = "";
-  document.getElementById("img").value = "";
+    localStorage.setItem("saint_posts", JSON.stringify(posts));
 
-  renderPosts();
+    document.getElementById("saint").value = "";
+    document.getElementById("quote").value = "";
+    document.getElementById("img").value = "";
+
+    loadPosts();
 }
 
-renderPosts();
+loadPosts();
 </script>
-    <script>
-function loadQuotes() {
-  const box = document.getElementById("quotesBox");
-  const saved = JSON.parse(localStorage.getItem("saintQuotes")) || [];
 
-  box.innerHTML = "";
-
-  saved.forEach(q => {
-    const p = document.createElement("p");
-    p.textContent = q;
-    box.appendChild(p);
-  });
-}
-
-function addQuote() {
-  const input = document.getElementById("quoteInput");
-  const box = document.getElementById("quotesBox");
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  let saved = JSON.parse(localStorage.getItem("saintQuotes")) || [];
-  saved.push(text);
-
-  localStorage.setItem("saintQuotes", JSON.stringify(saved));
-
-  input.value = "";
-  loadQuotes();
-}
-
-window.onload = loadQuotes;
-</script>
 </body>
 </html>
-<section style="max-width:700px;margin:auto;padding:20px;">
-    <section id="saint-quotes">
-  <h2>✝ Saint Quotes</h2>
-
-  <input id="saint" placeholder="Saint or Clergy Name" style="width:100%;padding:8px;"><br><br>
-
-  <textarea id="quote" placeholder="Write the quote..." style="width:100%;height:80px;padding:8px;"></textarea><br><br>
-
-  <input id="img" placeholder="Image URL (optional)" style="width:100%;padding:8px;"><br><br>
-
-  <button onclick="addPost()" style="padding:10px 15px;">Post</button>
-
-  <hr>
-
-  <div id="feed"></div>
-</section>
