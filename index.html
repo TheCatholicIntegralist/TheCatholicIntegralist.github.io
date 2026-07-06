@@ -246,84 +246,109 @@ function addPost(){
 
     loadPosts();
 }
+<script>
+let currentUser = null;
 
-/* DISCUSSION SYSTEM */
-let currentUser=null;
-
+/* ---------------- LOGIN ---------------- */
 function login(){
-    let u=document.getElementById("username").value.trim();
-    let p=document.getElementById("password").value.trim();
+    const u = document.getElementById("username").value.trim();
+    const p = document.getElementById("password").value.trim();
+    if(!u || !p) return;
 
-    if(!u||!p)return;
-
-    let users=JSON.parse(localStorage.getItem("users")||"{}");
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
 
     if(!users[u]){
-        users[u]={pass:p,banned:false};
-        localStorage.setItem("users",JSON.stringify(users));
+        users[u] = { pass:p, banned:false };
     }
 
-    if(users[u].pass!==p){
+    if(users[u].pass !== p){
         alert("Wrong password");
         return;
     }
 
     if(users[u].banned){
-        alert("Banned user");
+        alert("You are banned");
         return;
     }
 
-    currentUser=u;
+    localStorage.setItem("users", JSON.stringify(users));
 
-    document.getElementById("authBox").style.display="none";
-    document.getElementById("forumBox").style.display="block";
+    currentUser = u;
+
+    document.getElementById("authBox").style.display = "none";
+    document.getElementById("forumBox").style.display = "block";
 
     loadForum();
 }
 
+/* ---------------- ADD POST ---------------- */
 function addForumPost(){
-    let text=document.getElementById("postText").value.trim();
-    if(!text||!currentUser)return;
+    const text = document.getElementById("postText").value.trim();
+    if(!text || !currentUser) return;
 
-    let posts=JSON.parse(localStorage.getItem("forumPosts")||"[]");
+    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
 
-    posts.unshift({user:currentUser,text});
+    posts.unshift({
+        id: Date.now(),
+        user: currentUser,
+        text: text,
+        likes: 0
+    });
 
-    localStorage.setItem("forumPosts",JSON.stringify(posts));
+    localStorage.setItem("forumPosts", JSON.stringify(posts));
 
-    document.getElementById("postText").value="";
+    document.getElementById("postText").value = "";
 
     loadForum();
 }
 
+/* ---------------- LIKE POST 👍 ---------------- */
+function likePost(id){
+    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
+
+    let post = posts.find(p => p.id === id);
+    if(post){
+        post.likes = (post.likes || 0) + 1;
+    }
+
+    localStorage.setItem("forumPosts", JSON.stringify(posts));
+
+    loadForum();
+}
+
+/* ---------------- LOAD POSTS ---------------- */
 function loadForum(){
-    let box=document.getElementById("postsBox");
-    let posts=JSON.parse(localStorage.getItem("forumPosts")||"[]");
+    const box = document.getElementById("postsBox");
+    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
 
-    box.innerHTML="";
+    box.innerHTML = "";
 
-    posts.forEach(p=>{
-        let div=document.createElement("div");
-        div.style.borderBottom="1px solid #ddd";
-        div.style.padding="10px";
+    posts.forEach(p => {
+        const div = document.createElement("div");
+        div.style.borderBottom = "1px solid #ddd";
+        div.style.padding = "10px";
 
-        div.innerHTML=`<b>${p.user}</b><br>${p.text}`;
+        div.innerHTML = `
+            <b>${p.user}</b><br>
+            ${p.text}<br><br>
+            <button onclick="likePost(${p.id})">👍 ${p.likes || 0}</button>
+        `;
 
         box.appendChild(div);
     });
 }
 
-/* BAN SYSTEM */
+/* ---------------- BAN SYSTEM ---------------- */
 function banUser(name){
-    let users=JSON.parse(localStorage.getItem("users")||"{}");
-    if(users[name]) users[name].banned=true;
-    localStorage.setItem("users",JSON.stringify(users));
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+    if(users[name]){
+        users[name].banned = true;
+    }
+
+    localStorage.setItem("users", JSON.stringify(users));
 }
 
-/* INIT */
-loadPosts();
-
+/* ---------------- INIT ---------------- */
+loadForum();
 </script>
-
-</body>
-</html>
