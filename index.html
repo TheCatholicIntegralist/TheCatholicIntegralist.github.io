@@ -75,14 +75,13 @@ h2{
     color:#555;
 }
 
-/* 🔥 SAINT FEED STYLES */
+/* SAINT FEED */
 #saint-feed-box {
-    max-height: 400px;
+    max-height: 350px;
     overflow-y: auto;
     padding: 10px;
-    border: 1px solid #ddd;
     background: #f9f9f9;
-    scroll-behavior: smooth;
+    border: 1px solid #ddd;
 }
 
 .post {
@@ -90,6 +89,19 @@ h2{
     margin:10px 0;
     padding:10px;
     background:white;
+}
+
+/* DISCUSSION */
+#forumBox {
+    display:none;
+}
+
+#postsBox {
+    max-height: 300px;
+    overflow-y: auto;
+    background:#f9f9f9;
+    padding:10px;
+    border:1px solid #ddd;
 }
 
 footer{
@@ -115,6 +127,7 @@ footer{
 <a href="#work">Our Work</a>
 <a href="#contact">Contact</a>
 <a href="#quotes">Saint Quotes</a>
+<a href="#discussion">Discussion</a>
 </nav>
 
 <main>
@@ -127,32 +140,29 @@ Hebrews 3:4
 
 <section id="mission">
 <h2>Mission</h2>
-<p>
-Ad Triunum is a Catholic think tank dedicated to studying and promoting the social, political, philosophical, and theological traditions of historic Christianity.
-</p>
+<p>Ad Triunum is a Catholic think tank dedicated to serious Christian intellectual work.</p>
 </section>
 
 <section id="principles">
 <h2>Principles</h2>
 <ul>
-<li>Fidelity to Sacred Scripture and Sacred Tradition.</li>
-<li>Respect for the teaching authority of the Catholic Church.</li>
-<li>Promotion of the dignity of the human person.</li>
-<li>Defense of the family and the common good.</li>
+<li>Faithful to Catholic tradition</li>
+<li>Defense of truth and reason</li>
+<li>Common good and moral order</li>
 </ul>
 </section>
 
 <section id="work">
 <h2>Our Work</h2>
-<p>We publish essays, studies, and Catholic intellectual resources.</p>
+<p>Essays, theology, philosophy, and social thought.</p>
 </section>
 
 <section id="contact">
 <h2>Contact</h2>
-<p>More information will be added later.</p>
+<p>More information coming soon.</p>
 </section>
 
-<!-- ✝ SAINT QUOTES SECTION -->
+<!-- ✝ SAINT QUOTES -->
 <section id="quotes">
 <h2>✝ Saint & Clergy Quotes</h2>
 
@@ -169,6 +179,27 @@ Ad Triunum is a Catholic think tank dedicated to studying and promoting the soci
 <div id="saint-feed-box"></div>
 </section>
 
+<!-- DISCUSSION BOARD -->
+<section id="discussion">
+<h2>✝ Discussion Board</h2>
+
+<div id="authBox">
+  <input id="username" placeholder="Username" style="width:100%;padding:8px;"><br><br>
+  <input id="password" type="password" placeholder="Password" style="width:100%;padding:8px;"><br><br>
+  <button onclick="login()">Login / Sign Up</button>
+</div>
+
+<div id="forumBox">
+  <textarea id="postText" placeholder="Write your discussion..." style="width:100%;height:80px;"></textarea><br><br>
+  <button onclick="addForumPost()">Post</button>
+
+  <hr>
+
+  <div id="postsBox"></div>
+</div>
+
+</section>
+
 </main>
 
 <footer>
@@ -176,51 +207,122 @@ Ad Triunum is a Catholic think tank dedicated to studying and promoting the soci
 </footer>
 
 <script>
-function loadPosts() {
-    const feed = document.getElementById("saint-feed-box");
-    const posts = JSON.parse(localStorage.getItem("saint_posts") || "[]");
 
-    feed.innerHTML = "";
+/* SAINT QUOTES */
+function loadPosts(){
+    const feed=document.getElementById("saint-feed-box");
+    let posts=JSON.parse(localStorage.getItem("saint_posts")||"[]");
 
-    posts.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "post";
+    feed.innerHTML="";
 
-        div.innerHTML = `
-            <h3>${p.saint}</h3>
-            <p style="font-style:italic;">"${p.quote}"</p>
-            ${p.img ? `<img src="${p.img}" style="max-width:200px;">` : ""}
+    posts.forEach(p=>{
+        let div=document.createElement("div");
+        div.className="post";
+        div.innerHTML=`
+        <h3>${p.saint}</h3>
+        <p><i>"${p.quote}"</i></p>
+        ${p.img?`<img src="${p.img}" style="max-width:200px;">`:""}
         `;
-
         feed.appendChild(div);
     });
 }
 
-function addPost() {
-    const saint = document.getElementById("saint").value.trim();
-    const quote = document.getElementById("quote").value.trim();
-    const img = document.getElementById("img").value.trim();
+function addPost(){
+    let saint=document.getElementById("saint").value.trim();
+    let quote=document.getElementById("quote").value.trim();
+    let img=document.getElementById("img").value.trim();
 
-    if (!saint || !quote) return;
+    if(!saint||!quote)return;
 
-    let posts = JSON.parse(localStorage.getItem("saint_posts") || "[]");
+    let posts=JSON.parse(localStorage.getItem("saint_posts")||"[]");
 
-    posts.unshift({
-        saint: saint,
-        quote: quote,
-        img: img
-    });
+    posts.unshift({saint,quote,img});
 
-    localStorage.setItem("saint_posts", JSON.stringify(posts));
+    localStorage.setItem("saint_posts",JSON.stringify(posts));
 
-    document.getElementById("saint").value = "";
-    document.getElementById("quote").value = "";
-    document.getElementById("img").value = "";
+    document.getElementById("saint").value="";
+    document.getElementById("quote").value="";
+    document.getElementById("img").value="";
 
     loadPosts();
 }
 
+/* DISCUSSION SYSTEM */
+let currentUser=null;
+
+function login(){
+    let u=document.getElementById("username").value.trim();
+    let p=document.getElementById("password").value.trim();
+
+    if(!u||!p)return;
+
+    let users=JSON.parse(localStorage.getItem("users")||"{}");
+
+    if(!users[u]){
+        users[u]={pass:p,banned:false};
+        localStorage.setItem("users",JSON.stringify(users));
+    }
+
+    if(users[u].pass!==p){
+        alert("Wrong password");
+        return;
+    }
+
+    if(users[u].banned){
+        alert("Banned user");
+        return;
+    }
+
+    currentUser=u;
+
+    document.getElementById("authBox").style.display="none";
+    document.getElementById("forumBox").style.display="block";
+
+    loadForum();
+}
+
+function addForumPost(){
+    let text=document.getElementById("postText").value.trim();
+    if(!text||!currentUser)return;
+
+    let posts=JSON.parse(localStorage.getItem("forumPosts")||"[]");
+
+    posts.unshift({user:currentUser,text});
+
+    localStorage.setItem("forumPosts",JSON.stringify(posts));
+
+    document.getElementById("postText").value="";
+
+    loadForum();
+}
+
+function loadForum(){
+    let box=document.getElementById("postsBox");
+    let posts=JSON.parse(localStorage.getItem("forumPosts")||"[]");
+
+    box.innerHTML="";
+
+    posts.forEach(p=>{
+        let div=document.createElement("div");
+        div.style.borderBottom="1px solid #ddd";
+        div.style.padding="10px";
+
+        div.innerHTML=`<b>${p.user}</b><br>${p.text}`;
+
+        box.appendChild(div);
+    });
+}
+
+/* BAN SYSTEM */
+function banUser(name){
+    let users=JSON.parse(localStorage.getItem("users")||"{}");
+    if(users[name]) users[name].banned=true;
+    localStorage.setItem("users",JSON.stringify(users));
+}
+
+/* INIT */
 loadPosts();
+
 </script>
 
 </body>
