@@ -6,6 +6,10 @@
 <title>Ad Triunum – A Catholic Think Tank</title>
 
 <style>
+html {
+  scroll-behavior: smooth;
+}
+
 body{
     margin:0;
     background:#ece7d5;
@@ -75,16 +79,16 @@ h2{
     color:#555;
 }
 
-/* SAINT FEED */
-#saint-feed-box {
+/* SAINT QUOTES */
+#saint-feed {
     max-height: 350px;
     overflow-y: auto;
     padding: 10px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
+    background:#f9f9f9;
+    border:1px solid #ddd;
 }
 
-.post {
+.saint-post{
     border:1px solid #ccc;
     margin:10px 0;
     padding:10px;
@@ -92,16 +96,21 @@ h2{
 }
 
 /* DISCUSSION */
-#forumBox {
+#forumBox{
     display:none;
 }
 
-#postsBox {
-    max-height: 300px;
-    overflow-y: auto;
+#postsBox{
+    max-height: 350px;
+    overflow-y:auto;
     background:#f9f9f9;
     padding:10px;
     border:1px solid #ddd;
+}
+
+.post{
+    border-bottom:1px solid #ddd;
+    padding:10px;
 }
 
 footer{
@@ -124,8 +133,7 @@ footer{
 <nav>
 <a href="#mission">Mission</a>
 <a href="#principles">Principles</a>
-<a href="#work">Our Work</a>
-<a href="#contact">Contact</a>
+<a href="#work">Work</a>
 <a href="#quotes">Saint Quotes</a>
 <a href="#discussion">Discussion</a>
 </nav>
@@ -140,46 +148,39 @@ Hebrews 3:4
 
 <section id="mission">
 <h2>Mission</h2>
-<p>Ad Triunum is a Catholic think tank dedicated to serious Christian intellectual work.</p>
+<p>Ad Triunum is a Catholic think tank dedicated to theology, philosophy, and Christian renewal.</p>
 </section>
 
 <section id="principles">
 <h2>Principles</h2>
 <ul>
-<li>Faithful to Catholic tradition</li>
-<li>Defense of truth and reason</li>
-<li>Common good and moral order</li>
+<li>Faithfulness to Tradition</li>
+<li>Truth in theology and reason</li>
+<li>Christian moral order</li>
 </ul>
 </section>
 
 <section id="work">
 <h2>Our Work</h2>
-<p>Essays, theology, philosophy, and social thought.</p>
-</section>
-
-<section id="contact">
-<h2>Contact</h2>
-<p>More information coming soon.</p>
+<p>Essays, discussions, and Catholic intellectual study.</p>
 </section>
 
 <!-- ✝ SAINT QUOTES -->
 <section id="quotes">
 <h2>✝ Saint & Clergy Quotes</h2>
 
-<input id="saint" placeholder="Saint or Clergy Name" style="width:100%;padding:8px;"><br><br>
+<input id="saintName" placeholder="Saint or Clergy Name" style="width:100%;padding:8px;"><br><br>
 
-<textarea id="quote" placeholder="Write the quote..." style="width:100%;height:80px;padding:8px;"></textarea><br><br>
+<textarea id="saintQuote" placeholder="Write the quote..." style="width:100%;height:80px;padding:8px;"></textarea><br><br>
 
-<input id="img" placeholder="Image URL (optional)" style="width:100%;padding:8px;"><br><br>
-
-<button onclick="addPost()" style="padding:10px 15px;">Post Quote</button>
+<button onclick="addSaintQuote()" style="padding:10px 15px;">Post Quote</button>
 
 <hr>
 
-<div id="saint-feed-box"></div>
+<div id="saint-feed"></div>
 </section>
 
-<!-- DISCUSSION BOARD -->
+<!-- DISCUSSION -->
 <section id="discussion">
 <h2>✝ Discussion Board</h2>
 
@@ -190,8 +191,8 @@ Hebrews 3:4
 </div>
 
 <div id="forumBox">
-  <textarea id="postText" placeholder="Write your discussion..." style="width:100%;height:80px;"></textarea><br><br>
-  <button onclick="addForumPost()">Post</button>
+  <textarea id="postText" placeholder="Write a discussion..." style="width:100%;height:80px;"></textarea><br><br>
+  <button onclick="addPost()">Post</button>
 
   <hr>
 
@@ -208,51 +209,53 @@ Hebrews 3:4
 
 <script>
 
-/* SAINT QUOTES */
-function loadPosts(){
-    const feed=document.getElementById("saint-feed-box");
-    let posts=JSON.parse(localStorage.getItem("saint_posts")||"[]");
+/* ===================== SAINT QUOTES ===================== */
 
-    feed.innerHTML="";
+function loadSaintQuotes(){
+    const box = document.getElementById("saint-feed");
+    let quotes = JSON.parse(localStorage.getItem("saint_quotes") || "[]");
 
-    posts.forEach(p=>{
-        let div=document.createElement("div");
-        div.className="post";
-        div.innerHTML=`
-        <h3>${p.saint}</h3>
-        <p><i>"${p.quote}"</i></p>
-        ${p.img?`<img src="${p.img}" style="max-width:200px;">`:""}
+    box.innerHTML = "";
+
+    quotes.forEach(q => {
+        let div = document.createElement("div");
+        div.className = "saint-post";
+
+        div.innerHTML = `
+            <h3>${q.name}</h3>
+            <p style="font-style:italic;">"${q.text}"</p>
         `;
-        feed.appendChild(div);
+
+        box.appendChild(div);
     });
 }
 
-function addPost(){
-    let saint=document.getElementById("saint").value.trim();
-    let quote=document.getElementById("quote").value.trim();
-    let img=document.getElementById("img").value.trim();
+function addSaintQuote(){
+    let name = document.getElementById("saintName").value.trim();
+    let text = document.getElementById("saintQuote").value.trim();
 
-    if(!saint||!quote)return;
+    if(!name || !text) return;
 
-    let posts=JSON.parse(localStorage.getItem("saint_posts")||"[]");
+    let quotes = JSON.parse(localStorage.getItem("saint_quotes") || "[]");
 
-    posts.unshift({saint,quote,img});
+    quotes.unshift({ name, text });
 
-    localStorage.setItem("saint_posts",JSON.stringify(posts));
+    localStorage.setItem("saint_quotes", JSON.stringify(quotes));
 
-    document.getElementById("saint").value="";
-    document.getElementById("quote").value="";
-    document.getElementById("img").value="";
+    document.getElementById("saintName").value = "";
+    document.getElementById("saintQuote").value = "";
 
-    loadPosts();
+    loadSaintQuotes();
 }
-<script>
+
+/* ===================== DISCUSSION ===================== */
+
 let currentUser = null;
 
-/* ---------------- LOGIN ---------------- */
 function login(){
-    const u = document.getElementById("username").value.trim();
-    const p = document.getElementById("password").value.trim();
+    let u = document.getElementById("username").value.trim();
+    let p = document.getElementById("password").value.trim();
+
     if(!u || !p) return;
 
     let users = JSON.parse(localStorage.getItem("users") || "{}");
@@ -278,15 +281,14 @@ function login(){
     document.getElementById("authBox").style.display = "none";
     document.getElementById("forumBox").style.display = "block";
 
-    loadForum();
+    loadPosts();
 }
 
-/* ---------------- ADD POST ---------------- */
-function addForumPost(){
-    const text = document.getElementById("postText").value.trim();
+function addPost(){
+    let text = document.getElementById("postText").value.trim();
     if(!text || !currentUser) return;
 
-    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
+    let posts = JSON.parse(localStorage.getItem("forum_posts") || "[]");
 
     posts.unshift({
         id: Date.now(),
@@ -295,60 +297,49 @@ function addForumPost(){
         likes: 0
     });
 
-    localStorage.setItem("forumPosts", JSON.stringify(posts));
+    localStorage.setItem("forum_posts", JSON.stringify(posts));
 
     document.getElementById("postText").value = "";
 
-    loadForum();
+    loadPosts();
 }
 
-/* ---------------- LIKE POST 👍 ---------------- */
 function likePost(id){
-    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
+    let posts = JSON.parse(localStorage.getItem("forum_posts") || "[]");
 
     let post = posts.find(p => p.id === id);
-    if(post){
-        post.likes = (post.likes || 0) + 1;
-    }
+    if(post) post.likes++;
 
-    localStorage.setItem("forumPosts", JSON.stringify(posts));
+    localStorage.setItem("forum_posts", JSON.stringify(posts));
 
-    loadForum();
+    loadPosts();
 }
 
-/* ---------------- LOAD POSTS ---------------- */
-function loadForum(){
+function loadPosts(){
     const box = document.getElementById("postsBox");
-    let posts = JSON.parse(localStorage.getItem("forumPosts") || "[]");
+    let posts = JSON.parse(localStorage.getItem("forum_posts") || "[]");
 
     box.innerHTML = "";
 
     posts.forEach(p => {
-        const div = document.createElement("div");
-        div.style.borderBottom = "1px solid #ddd";
-        div.style.padding = "10px";
+        let div = document.createElement("div");
+        div.className = "post";
 
         div.innerHTML = `
             <b>${p.user}</b><br>
             ${p.text}<br><br>
-            <button onclick="likePost(${p.id})">👍 ${p.likes || 0}</button>
+            <button onclick="likePost(${p.id})">👍 ${p.likes}</button>
         `;
 
         box.appendChild(div);
     });
 }
 
-/* ---------------- BAN SYSTEM ---------------- */
-function banUser(name){
-    let users = JSON.parse(localStorage.getItem("users") || "{}");
+/* ===================== INIT ===================== */
 
-    if(users[name]){
-        users[name].banned = true;
-    }
+loadSaintQuotes();
 
-    localStorage.setItem("users", JSON.stringify(users));
-}
-
-/* ---------------- INIT ---------------- */
-loadForum();
 </script>
+
+</body>
+</html>
